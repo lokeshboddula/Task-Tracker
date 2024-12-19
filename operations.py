@@ -10,7 +10,6 @@ def add(task):
 
     data = {}
 
-
     with open('data.json', 'r') as file:
         file_data = json.load(file)
 
