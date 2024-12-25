@@ -5,10 +5,8 @@ import json
 
 curr_datetime = datetime.datetime.now()
 file_path = 'data.json'
-description_pattern = r"(['\"])(.*?)\1"
-update_format_pattern = r"^update (\d+) \"(.*?)\"$"
 
-def add(task):
+def add(description):
 
     data = {}
 
@@ -21,7 +19,7 @@ def add(task):
         file_data = json.load(file)
 
     data['id'] = len(file_data) + 1
-    data['description'] = re.search(pattern, task).group()[1:-1]
+    data['description'] = description
     data['status'] = 'todo'
     data['createdAt'] = str(curr_datetime)
     data['updatedAt'] = str(curr_datetime)
@@ -32,18 +30,7 @@ def add(task):
         json.dump(file_data, file, indent=4)
 
 
-def update(task):
-    if not re.match(update_format_pattern, task):
-        print("format error!, expected format: update <id> <description>")
-        return
-
-    parts = task.split(' ', 2)
-
-    if len(parts) != 3:
-        return "Invalid input format"
-
-    task_id = int(parts[1])
-    description = parts[2].strip('"')
+def update(task_id, status, description):
 
     with open(file_path, 'r') as file:
         file_data = json.load(file)
@@ -52,6 +39,7 @@ def update(task):
     for dict_at_index in file_data:
         if dict_at_index['id'] == task_id:
             dict_at_index['description'] = description
+            dict_at_index['status'] = status
             dict_at_index['updatedAt'] = str(curr_datetime)
             flag = True
             break
@@ -61,3 +49,36 @@ def update(task):
 
     with open(file_path, 'w') as file:
         json.dump(file_data, file, indent=4)
+
+
+def list_tasks(status=None):
+
+    with open(file_path, 'r') as file:
+        file_data = json.load(file)
+
+    tasks = file_data
+    if status:
+        tasks = [t for t in tasks if t['status'] == status]
+    for task in tasks:
+        print(
+            f"ID: {task['id']}, Status: {task['status']}, Description: {task['description']}")
+
+
+def delete(task_id):
+
+    with open(file_path, 'r') as file:
+        file_data = json.load(file)
+
+    flag = False
+    for i, dict_at_index in enumerate(file_data):
+        if dict_at_index['id'] == task_id:
+            del file_data[i]
+            flag = True
+            break
+
+    if not flag:
+        print("task with id : ", task_id, "not found!")
+    else:
+        with open(file_path, 'w') as file:
+            json.dump(file_data, file, indent=4)
+        print(f"Task with id {task_id} deleted successfully.")
