@@ -33,6 +33,8 @@ Follow these steps to get the task manager up and running:
 - Mark tasks as todo, in-progress, done as per requirement
 - Remove tasks from the list
 
+## Note : No need to create data.json file, it will be created when the first task is added.
+
 ## Requirements
 
 - Python 3.x
